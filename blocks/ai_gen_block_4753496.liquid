@@ -1,0 +1,539 @@
+{% doc %}
+  @prompt
+    Добави в страницата списък с всички продукти от колекция "Храни за кучета, Meglium и Primordial" с опция да се добявят в количката, както е в каталога, Може ли да направиш да се визуализират по същия начин както в страница "каталог"?ю, Нямат снимки на продуктите и цени
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-collection-products-{{ ai_gen_id }} {
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    display: block;
+    margin-top: {{ block.settings.spacing_top }}px;
+  }
+
+  .ai-collection-products__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.products_per_row }}, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-collection-products__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.products_per_row_tablet }}, 1fr);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-products__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.products_per_row_mobile }}, 1fr);
+    }
+  }
+
+  .ai-product-card-{{ ai_gen_id }} {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .ai-product-card__image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    background-color: #f4f4f4;
+    margin-bottom: 12px;
+  }
+
+  .ai-product-card__image-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-product-card__image-wrapper-{{ ai_gen_id }}:hover .ai-product-card__image-{{ ai_gen_id }} {
+    transform: scale(1.05);
+  }
+
+  .ai-product-card__info-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+  }
+
+  .ai-product-card__vendor-{{ ai_gen_id }} {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-product-card__title-{{ ai_gen_id }} {
+    font-size: 16px;
+    font-weight: 600;
+    color: {{ block.settings.title_color }};
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .ai-product-card__title-{{ ai_gen_id }} a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ai-product-card__title-{{ ai_gen_id }} a:hover {
+    color: {{ block.settings.title_hover_color }};
+  }
+
+  .ai-product-card__price-{{ ai_gen_id }} {
+    font-size: {{ block.settings.price_size }}px;
+    font-weight: 600;
+    color: {{ block.settings.price_color }};
+    margin: 4px 0;
+  }
+
+  .ai-product-card__price--compare-{{ ai_gen_id }} {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+    margin-left: 8px;
+    font-weight: 400;
+  }
+
+  .ai-product-card__price--sale-{{ ai_gen_id }} {
+    color: {{ block.settings.sale_price_color }};
+  }
+
+  .ai-product-card__badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: {{ block.settings.sale_badge_color }};
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .ai-product-card__add-to-cart-{{ ai_gen_id }} {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px 20px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+  }
+
+  .ai-product-card__add-to-cart-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+  }
+
+  .ai-product-card__add-to-cart-{{ ai_gen_id }}:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .ai-collection-products__empty-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+
+  .ai-collection-products__empty-icon-{{ ai_gen_id }} {
+    margin: 0 auto 20px;
+  }
+
+  .ai-collection-products__empty-icon-{{ ai_gen_id }} svg {
+    width: 80px;
+    height: 80px;
+    opacity: 0.3;
+  }
+{% endstyle %}
+
+<collection-products-{{ ai_gen_id }}
+  class="ai-collection-products-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.collection != blank %}
+    {% assign collection = block.settings.collection %}
+    {% assign products_limit = block.settings.products_limit %}
+    
+    <ul class="ai-collection-products__grid-{{ ai_gen_id }}">
+      {% for product in collection.products limit: products_limit %}
+        <li class="ai-product-card-{{ ai_gen_id }}">
+          <div class="ai-product-card__image-wrapper-{{ ai_gen_id }}">
+            {% if product.featured_image %}
+              <img
+                src="{{ product.featured_image | image_url: width: 600 }}"
+                alt="{{ product.featured_image.alt | escape }}"
+                class="ai-product-card__image-{{ ai_gen_id }}"
+                loading="lazy"
+                width="600"
+                height="600"
+              >
+            {% else %}
+              <div class="ai-product-card__image-{{ ai_gen_id }}">
+                {{ 'product-1' | placeholder_svg_tag }}
+              </div>
+            {% endif %}
+            
+            {% if product.compare_at_price > product.price %}
+              <div class="ai-product-card__badge-{{ ai_gen_id }}">
+                {% assign savings = product.compare_at_price | minus: product.price %}
+                {% assign savings_percent = savings | times: 100 | divided_by: product.compare_at_price %}
+                -{{ savings_percent }}%
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="ai-product-card__info-{{ ai_gen_id }}">
+            {% if block.settings.show_vendor and product.vendor != blank %}
+              <div class="ai-product-card__vendor-{{ ai_gen_id }}">{{ product.vendor }}</div>
+            {% endif %}
+
+            <h3 class="ai-product-card__title-{{ ai_gen_id }}">
+              <a href="{{ product.url }}">{{ product.title }}</a>
+            </h3>
+
+            <div class="ai-product-card__price-{{ ai_gen_id }} {% if product.compare_at_price > product.price %}ai-product-card__price--sale-{{ ai_gen_id }}{% endif %}">
+              {{ product.price | money }}
+              {% if product.compare_at_price > product.price %}
+                <span class="ai-product-card__price--compare-{{ ai_gen_id }}">
+                  {{ product.compare_at_price | money }}
+                </span>
+              {% endif %}
+            </div>
+
+            {% if product.available %}
+              <button
+                type="button"
+                class="ai-product-card__add-to-cart-{{ ai_gen_id }}"
+                data-product-id="{{ product.id }}"
+                data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              >
+                {{ block.settings.add_to_cart_text }}
+              </button>
+            {% else %}
+              <button
+                type="button"
+                class="ai-product-card__add-to-cart-{{ ai_gen_id }}"
+                disabled
+              >
+                {{ block.settings.sold_out_text }}
+              </button>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="ai-collection-products__empty-{{ ai_gen_id }}">
+      <div class="ai-collection-products__empty-icon-{{ ai_gen_id }}">
+        {{ 'collection-1' | placeholder_svg_tag }}
+      </div>
+      <p>Моля, изберете колекция от настройките на блока</p>
+    </div>
+  {% endif %}
+</collection-products-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CollectionProducts{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.setupAddToCart();
+      }
+
+      setupAddToCart() {
+        const buttons = this.querySelectorAll('.ai-product-card__add-to-cart-{{ ai_gen_id }}');
+        
+        buttons.forEach(button => {
+          button.addEventListener('click', async (e) => {
+            const variantId = button.dataset.variantId;
+            const originalText = button.textContent;
+            
+            button.disabled = true;
+            button.textContent = 'Добавяне...';
+            
+            try {
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  items: [{
+                    id: variantId,
+                    quantity: 1
+                  }]
+                })
+              });
+              
+              if (response.ok) {
+                button.textContent = 'Добавено ✓';
+                
+                const cartCountElements = document.querySelectorAll('.cart-count-bubble');
+                cartCountElements.forEach(el => {
+                  const currentCount = parseInt(el.textContent) || 0;
+                  el.textContent = currentCount + 1;
+                });
+                
+                if (window.theme && window.theme.cart) {
+                  window.theme.cart.refresh();
+                }
+                
+                document.dispatchEvent(new CustomEvent('cart:updated'));
+                
+                setTimeout(() => {
+                  button.textContent = originalText;
+                  button.disabled = false;
+                }, 2000);
+              } else {
+                throw new Error('Failed to add to cart');
+              }
+            } catch (error) {
+              console.error('Error adding to cart:', error);
+              button.textContent = 'Грешка';
+              setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+              }, 2000);
+            }
+          });
+        });
+      }
+    }
+
+    customElements.define('collection-products-{{ ai_gen_id }}', CollectionProducts{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Продукти от колекция",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Колекция"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Изберете колекция"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "label": "Брой продукти",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Ширина на десктоп",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "spacing_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Отстояние отгоре",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Оформление на мрежата"
+    },
+    {
+      "type": "range",
+      "id": "products_per_row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "Продукти на ред (десктоп)",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "products_per_row_tablet",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Продукти на ред (таблет)",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "products_per_row_mobile",
+      "label": "Продукти на ред (мобилен)",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Разстояние между продукти",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Изображения"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Закръгляне на изображенията",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Информация за продукта"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Показване на производител",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Цвят на заглавието",
+      "default": "#142c73"
+    },
+    {
+      "type": "color",
+      "id": "title_hover_color",
+      "label": "Цвят при посочване",
+      "default": "#ffd701"
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Размер на цената",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Цвят на цената",
+      "default": "#142c73"
+    },
+    {
+      "type": "color",
+      "id": "sale_price_color",
+      "label": "Цвят на намалената цена",
+      "default": "#d20404"
+    },
+    {
+      "type": "color",
+      "id": "sale_badge_color",
+      "label": "Цвят на значката за намаление",
+      "default": "#d20404"
+    },
+    {
+      "type": "header",
+      "content": "Бутон за добавяне"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_text",
+      "label": "Текст на бутона",
+      "default": "Добави в количката"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "Текст при изчерпан продукт",
+      "default": "Изчерпан"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Фон на бутона",
+      "default": "#ffd701"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Фон при посочване",
+      "default": "#142c73"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Цвят на текста",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Закръгляне на бутона",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Продукти от колекция"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,66 @@
+<div class="submenu-design__simple">
+  <ul class="unstyle-ul">
+    {%- for childlink in link.links -%}
+
+    {%- assign submenu_icon = '' -%}
+{%- case childlink.title -%}
+  {%- when 'Храни', 'Храни и препарати' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'food_sm' -%}{%- endcapture -%}
+  {%- when 'Аксесоари', 'Играчки и аксесоари' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'paw_sm' -%}{%- endcapture -%}
+  {%- when 'Козметика', 'Козметика и грижа' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'grooming_sm' -%}{%- endcapture -%}
+  {%- when 'Лакомства и витамини', 'Крекери, витамини и минерали' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'pharmacy_sm' -%}{%- endcapture -%}
+  {%- when 'Нашийници, нагръдници и поводи за кучета', 'Нашийници, нагръдници и поводи' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'coat_sm' -%}{%- endcapture -%}
+  {%- when 'Играчки' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'cat_toy_sm' -%}{%- endcapture -%}
+  {%- when 'Легла, одеяла и постелки', 'Драскалки, катерушки, легла и одеала' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'hotel_sm' -%}{%- endcapture -%}
+  {%- when 'Съдове за храна и вода', 'Съдове и пълнители за тоалетни' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'bowl_sm' -%}{%- endcapture -%}
+  {%- when 'Дрехи и бандани' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'coat_sm' -%}{%- endcapture -%}
+  {%- when 'Транспортни чанти, клетки, къщи и заграждения', 'Транспортни чанти, клетки и заграждения', 'Транспортни чанти' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'box_cat_sm' -%}{%- endcapture -%}
+  {%- when 'Тоалетни' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'litter_box_sm' -%}{%- endcapture -%}
+  {%- when 'Аквариуми, терариуми и аксесоари' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'fish_sm' -%}{%- endcapture -%}
+{%- endcase -%}
+
+
+    
+
+    {%- if childlink.links != blank -%}
+    <li class="submenu-container">
+      <a href="{{ childlink.url }}" class="submenu__item body2{% if childlink.current or childlink.child_active %} submenu__item--active{% endif %}">
+        {{ submenu_icon }}
+        <span>{{ childlink.title | escape }}{%- render "menu-badge" item_name:childlink.title -%}</span>
+        {%- render "icon-arrow-right-small" -%}
+      </a>
+
+      <div class="submenu-design__simple">
+        <ul class="unstyle-ul">
+          {%- for grandchildlink in childlink.links -%} 
+          <li>
+            <a href="{{ grandchildlink.url }}" class="submenu__item body2{% if grandchildlink.current %} submenu__item--active{% endif %}">
+              <span>{{ grandchildlink.title | escape }}{%- render "menu-badge" item_name:grandchildlink.title -%}</span>
+            </a>
+          </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </li>
+    {%- else -%}
+    <li>
+      <a href="{{ childlink.url }}" class="submenu__item body2{% if childlink.current or childlink.child_active %} submenu__item--active{% endif %}">
+        {{ submenu_icon }}
+        <span>{{ childlink.title | escape }}{%- render "menu-badge" item_name:childlink.title -%}</span>
+      </a>
+    </li>
+    {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</div>

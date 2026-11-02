@@ -1,0 +1,134 @@
+<nav class="menu-drawer__navigation">
+  <ul class="unstyle-ul">   
+    {%- for link in linklist -%}
+    {%- if link.links != blank -%}
+    <li>
+      <details>
+        <summary>
+           
+          <div class="menu-drawer__menu-item h6{% if link.current or link.child_active %} menu-drawer__menu-item--active{% endif %}">
+            {%- if desktop_menu_type != 'header-layout-classic' -%}
+            {%- render 'get-menu-icon-code', icons:icons, forloop_index:forloop.index -%}
+            {%- endif -%}
+            <span>{{ link.title | escape }}{%- render "menu-badge" item_name:link.title -%}</span>
+            {%- render 'icon-arrow-right-small' -%}
+          </div>
+        </summary>
+        
+        <div class="menu-drawer__submenu">
+          <div class="menu-drawer__inner-submenu">
+
+            <ul class="unstyle-ul menu-drawer__submenu-content">
+              <li>
+                <button class="menu-drawer__back-button menu-drawer__menu-item link">
+                  {%- render "icon-arrow-left" -%}
+                </button>
+              </li>
+              <li>
+                <a href="{{ link.url }}" class="menu-drawer__menu-item h5{% if link.current or link.child_active %} menu-drawer__menu-item--active{% endif %}">
+                  {{ link.title | escape }}{%- render "menu-badge" item_name:link.title -%}
+                </a>
+              </li>
+
+              {%- for childlink in link.links -%}
+
+              {%- assign submenu_icon = '' -%}
+{%- case childlink.title -%}
+  {%- when 'Храни', 'Храни и препарати' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'food_sm' -%}{%- endcapture -%}
+  {%- when 'Аксесоари', 'Играчки и аксесоари' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'paw_sm' -%}{%- endcapture -%}
+  {%- when 'Козметика', 'Козметика и грижа' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'grooming_sm' -%}{%- endcapture -%}
+  {%- when 'Лакомства и витамини', 'Крекери, витамини и минерали' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'pharmacy_sm' -%}{%- endcapture -%}
+  {%- when 'Нашийници, нагръдници и поводи за кучета', 'Нашийници, нагръдници и поводи' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'coat_sm' -%}{%- endcapture -%}
+  {%- when 'Играчки' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'cat_toy_sm' -%}{%- endcapture -%}
+  {%- when 'Легла, одеяла и постелки', 'Драскалки, катерушки, легла и одеала' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'hotel_sm' -%}{%- endcapture -%}
+  {%- when 'Съдове за храна и вода', 'Съдове и пълнители за тоалетни' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'bowl_sm' -%}{%- endcapture -%}
+  {%- when 'Дрехи и бандани' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'coat_sm' -%}{%- endcapture -%}
+  {%- when 'Транспортни чанти, клетки, къщи и заграждения', 'Транспортни чанти, клетки и заграждения', 'Транспортни чанти' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'box_cat_sm' -%}{%- endcapture -%}
+  {%- when 'Тоалетни' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'litter_box_sm' -%}{%- endcapture -%}
+  {%- when 'Аквариуми, терариуми и аксесоари' -%}
+    {%- capture submenu_icon %}{%- render 'icons-list', icon_name: 'fish_sm' -%}{%- endcapture -%}
+    {%- else -%}
+    {%- assign submenu_icon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>' -%}
+{%- endcase -%}
+
+
+
+
+              {%- if childlink.links != blank -%}
+              <li>
+                <details>
+                  <summary>
+                    <div class="menu-drawer__menu-item body2{% if childlink.current or childlink.child_active %} menu-drawer__menu-item--active{% endif %}">
+                      {{ submenu_icon }}
+                        <span>{{ childlink.title | escape }}{%- render "menu-badge" item_name:childlink.title -%}</span> {%- render 'icon-arrow-right-small' -%}
+                    </div>
+                  </summary>
+
+                  <div class="menu-drawer__submenu">
+                    <div class="menu-drawer__inner-submenu">
+                      <ul class="unstyle-ul menu-drawer__submenu-content">
+                        <li>
+                          <button class="menu-drawer__back-button menu-drawer__menu-item link">
+                            {%- render "icon-arrow-left" -%}
+                          </button>
+                        </li>
+                        <li>
+                          <a href="{{ childlink.url }}" class="menu-drawer__menu-item h5{% if childlink.current or childlink.child_active %} menu-drawer__menu-item--active{% endif %}">
+                            {{ childlink.title | escape }}{%- render "menu-badge" item_name:childlink.title -%}
+                          </a>
+                        </li>
+                        {%- for grandchildlink in childlink.links -%}
+                        <li>
+                          <a href="{{ childlink.url }}" class="menu-drawer__menu-item body2{% if childlink.current %} menu-drawer__menu-item--active{% endif %}">
+  {{ submenu_icon }}
+  <span>{{ childlink.title | escape }}{%- render "menu-badge" item_name:childlink.title -%}</span>
+</a>
+
+                        </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  </div>
+
+                </details>
+              </li>
+              {%- else -%}
+              <li>
+                <a href="{{ childlink.url }}" class="menu-drawer__menu-item body2{% if childlink.current %} menu-drawer__menu-item--active{% endif %}">
+  {{ submenu_icon }}
+  <span>{{ childlink.title | escape }}{%- render "menu-badge" item_name:childlink.title -%}</span>
+</a>
+
+              </li>
+              {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+
+      </details>
+    </li>
+    {%- else -%}
+    <li>
+      <a href="{{ link.url }}" class="menu-drawer__menu-item h6{% if link.current %} menu-drawer__menu-item--active{% endif %}">
+        {%- if desktop_menu_type != 'header-layout-classic' -%}
+        {%- render 'get-menu-icon-code', icons:icons, forloop_index:forloop.index -%}
+        {%- endif -%}
+        <span>{{ link.title | escape }}{%- render "menu-badge" item_name:link.title -%}</span>
+      </a>
+    </li>
+    {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</nav>
