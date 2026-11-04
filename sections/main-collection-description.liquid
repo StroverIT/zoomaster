@@ -1,7 +1,70 @@
-{%- if collection.description != blank -%}
+{%- liquid
+  assign seo_collection_copy = blank
+  if collection.description == blank
+    case collection.handle
+      when 'храни-за-кучета-meglium-и-primordial'
+        assign seo_collection_copy = '<p>В ZooMaster ще намерите богат избор от <strong>храна за кучета</strong> – суха и мокра храна от марки като Meglium, Primordial и ZooMaster. Подберете според възраст, порода и вкус, с бърза доставка в София и цяла България.</p>'
+      when 'суха-храна-за-кучета'
+        assign seo_collection_copy = '<p>Разгледайте нашата селекция <strong>суха храна за кучета</strong> за кученца, възрастни и чувствителни стомаси. Качествени гранули на добра цена с удобна онлайн поръчка.</p>'
+      when 'консервирана-храна-за-кучета'
+        assign seo_collection_copy = '<p><strong>Консервирана храна за кучета</strong> с различни вкусове – идеална като основно меню или допълнение към сухата храна. Поръчайте онлайн от ZooMaster.</p>'
+      when 'храна-за-котки-primordial-и-meglium'
+        assign seo_collection_copy = '<p>Купете <strong>храна за котки</strong> онлайн – суха храна, паучове и консерви от надеждни марки. Доставка в София със собствен транспорт при поръчки над 50€.</p>'
+      when 'суха-храна-за-котки'
+        assign seo_collection_copy = '<p>Селекция <strong>суха храна за котки</strong> за възрастни, кастрирани и котенца. Балансирани формули за енергия, козина и добро храносмилане.</p>'
+      when 'консервирана-храна-за-котки'
+        assign seo_collection_copy = '<p><strong>Консервирана храна за котки</strong> и паучове с апетитни рецепти. Перфектен избор за хидратация и ежедневно меню.</p>'
+      when 'meglium'
+        assign seo_collection_copy = '<p><strong>Meglium</strong> храна за кучета и котки – италианско качество на достъпна цена. Разгледайте сухите и мокрите рецепти в ZooMaster.</p>'
+      when 'primordial'
+        assign seo_collection_copy = '<p><strong>Primordial</strong> е grain-free храна без зърнени съставки за кучета и котки. Натурални формули за чувствителни любимци.</p>'
+      when 'лакомства-и-витамини-за-кучета'
+        assign seo_collection_copy = '<p><strong>Лакомства и витамини за кучета</strong> за тренировки, дентална грижа и подкрепа на имунитета. Поръчайте лесно онлайн.</p>'
+      when 'аксесоари-за-кучета'
+        assign seo_collection_copy = '<p><strong>Аксесоари за кучета</strong> – нашийници, поводи, играчки, легла и съдове. Всичко необходимо за комфорта на вашия любимец.</p>'
+      when 'аксесоари-за-котки'
+        assign seo_collection_copy = '<p><strong>Аксесоари за котки</strong> – играчки, драскалки, съдове, легла и транспортни чанти. Качество на добра цена с удобна онлайн поръчка от ZooMaster.</p>'
+      when 'frontpage'
+        assign seo_collection_copy = '<p>Специализирана <strong>храна за кученца</strong> и малки кучета за здравословен растеж. Изберете балансирани формули от доказани марки с доставка от ZooMaster.</p>'
+      when 'лакомства-и-витамини-за-котки'
+        assign seo_collection_copy = '<p><strong>Лакомства и витамини за котки</strong> – за имунитет, козина и добро настроение. Качествени добавки и снаксове от ZooMaster.</p>'
+      when 'нашийници-нагръдници-и-поводи'
+        assign seo_collection_copy = '<p><strong>Нашийници, нагръдници и поводи за кучета</strong> – здрави и удобни модели за ежедневни разходки. Изберете подходящия размер онлайн.</p>'
+      when 'съдове-и-пълнители-за-тоалетни-за-котки'
+        assign seo_collection_copy = '<p><strong>Котешки тоалетни и пълнители</strong>, постелки и аксесоари за чист дом. Хигиена за котки с бърза доставка от ZooMaster.</p>'
+      when 'храна-за-малки-котенца'
+        assign seo_collection_copy = '<p><strong>Храна за котенца</strong> за здравословен растеж и развитие. Изберете подходяща суха или мокра храна онлайн от ZooMaster.</p>'
+      when 'без-глутен'
+        assign seo_collection_copy = '<p><strong>Храна без глутен</strong> и без зърнени съставки за чувствителни кучета и котки. Grain-free рецепти от доказани марки в ZooMaster.</p>'
+      when 'mamynat'
+        assign seo_collection_copy = '<p><strong>MamyNat</strong> продукти онлайн в ZooMaster. Качествена храна за домашни любимци с бърза доставка в София и цяла България.</p>'
+      when 'zoomaster', 'zoomaster-1'
+        assign seo_collection_copy = '<p>Собствена линия <strong>ZooMaster</strong> – храна и продукти за кучета и котки на достъпни цени. Поръчайте онлайн с доставка в София.</p>'
+      when 'храна-за-птици-1'
+        assign seo_collection_copy = '<p><strong>Храна за птици</strong>, крекери и добавки за здраве и жизненост. Поръчайте онлайн от ZooMaster с доставка до вашия адрес.</p>'
+      when 'храна-за-гризачи'
+        assign seo_collection_copy = '<p><strong>Храна за гризачи</strong> и лакомства за зайци, хамстери и други малки любимци. Качествени смеси с доставка от ZooMaster.</p>'
+      when 'храна-за-риби'
+        assign seo_collection_copy = '<p><strong>Храна за риби</strong> и препарати за аквариум. Всичко необходимо за здраво аквариумно стопанство от ZooMaster.</p>'
+      when 'консервирана-храна-за-кучета'
+        assign seo_collection_copy = '<p><strong>Консервирана храна за кучета</strong> с различни вкусове – като основно меню или допълнение към сухата храна. Поръчайте онлайн от ZooMaster.</p>'
+      when 'суха-храна-за-кучета'
+        assign seo_collection_copy = '<p>Разгледайте нашата селекция <strong>суха храна за кучета</strong> за кученца, възрастни и чувствителни стомаси. Качествени гранули на добра цена.</p>'
+      when 'консервирана-храна-за-котки'
+        assign seo_collection_copy = '<p><strong>Консервирана храна за котки</strong> и паучове с апетитни рецепти. Перфектен избор за хидратация и ежедневно меню.</p>'
+      when 'суха-храна-за-котки'
+        assign seo_collection_copy = '<p>Селекция <strong>суха храна за котки</strong> за възрастни, кастрирани и котенца. Балансирани формули за енергия, козина и добро храносмилане.</p>'
+    endcase
+  endif
+-%}
+{%- if collection.description != blank or seo_collection_copy != blank -%}
 <div class="top-spacing-{{ section.settings.top_spacing }}">
   <div class="{% if section.settings.width != "default" %}{{ section.settings.width }}{% else %}{{ settings.page_width_main }}{% endif %} {{ section.settings.texts_aligment }} mt--first-child-0">
-	{{ collection.description }}
+	{%- if collection.description != blank -%}
+	  {{ collection.description }}
+	{%- else -%}
+	  {{ seo_collection_copy }}
+	{%- endif -%}
   </div>
 </div>
 {%- endif -%}

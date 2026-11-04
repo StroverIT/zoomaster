@@ -1,0 +1,81 @@
+{%- comment -%} Structured data for search engines {%- endcomment -%}
+{%- liquid
+  assign schema_title = page_title
+  assign schema_description = page_description | default: shop.description
+
+  if request.page_type == 'index'
+    assign schema_title = 'Онлайн зоомагазин | Храна за кучета и котки с доставка в София'
+    assign schema_description = 'Купете храна за кучета и котки онлайн от ZooMaster. Марки Meglium, Primordial, MamyNat и ZooMaster. Безплатна доставка в София над 50€ със собствен транспорт.'
+  elsif request.page_type == 'collection' and collection != blank
+    if schema_description == blank and collection.description != blank
+      assign schema_description = collection.description | strip_html | truncate: 300
+    endif
+  elsif request.page_type == 'product' and product != blank
+    if schema_description == blank
+      assign schema_description = product.description | strip_html | truncate: 300
+    endif
+  endif
+-%}
+
+{%- comment -%} Organization schema already exists in header.liquid {%- endcomment -%}
+{%- capture seo_search_target -%}{{ request.origin }}{{ routes.search_url }}?q={search_term_string}{%- endcapture -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ shop.name | json }},
+  "url": {{ request.origin | json }},
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {{ seo_search_target | json }},
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+{%- if request.page_type == 'collection' and collection != blank -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ schema_title | json }},
+  "description": {{ schema_description | json }},
+  "url": {{ canonical_url | json }}
+}
+</script>
+{%- endif -%}
+
+{%- if request.page_type == 'product' and product != blank -%}
+{%- liquid
+  assign availability = 'https://schema.org/OutOfStock'
+  if product.available
+    assign availability = 'https://schema.org/InStock'
+  endif
+  assign product_price = product.selected_or_first_available_variant.price | money_without_currency | replace: ',', '.'
+-%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "description": {{ schema_description | json }},
+  "url": {{ canonical_url | json }},
+  "sku": {{ product.selected_or_first_available_variant.sku | json }},
+  "brand": {
+    "@type": "Brand",
+    "name": {{ product.vendor | default: shop.name | json }}
+  },
+  {%- if product.featured_image -%}
+  "image": {{ product.featured_image | image_url: width: 1200 | prepend: "https:" | json }},
+  {%- endif -%}
+  "offers": {
+    "@type": "Offer",
+    "url": {{ canonical_url | json }},
+    "priceCurrency": {{ cart.currency.iso_code | json }},
+    "price": {{ product_price | json }},
+    "availability": {{ availability | json }},
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
+{%- endif -%}

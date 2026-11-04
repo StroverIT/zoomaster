@@ -53,6 +53,13 @@ class FacetFiltersForm extends HTMLElement {
     if (updateURLHash) FacetFiltersForm.updateURLHash(searchParams);
   }
 
+  static scrollToTop() {
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    window.scrollTo({ top: 0, left: 0, behavior });
+    document.documentElement.scrollTo({ top: 0, left: 0, behavior });
+    document.body.scrollTo({ top: 0, left: 0, behavior });
+  }
+
   static renderSectionFromFetch(url, event) {
     fetch(url)
       .then(response => response.text())
@@ -62,6 +69,7 @@ class FacetFiltersForm extends HTMLElement {
         FacetFiltersForm.renderFilters(html, event);
         FacetFiltersForm.renderProductGridContainer(html);
         FacetFiltersForm.renderProductCount(html);
+        FacetFiltersForm.scrollToTop();
       });
   }
 
@@ -70,6 +78,7 @@ class FacetFiltersForm extends HTMLElement {
     FacetFiltersForm.renderFilters(html, event);
     FacetFiltersForm.renderProductGridContainer(html);
     FacetFiltersForm.renderProductCount(html);
+    FacetFiltersForm.scrollToTop();
   }
 
   static renderProductGridContainer(html) {

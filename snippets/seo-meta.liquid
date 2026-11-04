@@ -1,0 +1,119 @@
+{%- comment -%}
+  Outputs optimized <title> and meta description.
+  Keeps Admin SEO when a custom collection title is already set.
+{%- endcomment -%}
+{%- liquid
+  assign seo_title = page_title
+  assign seo_description = page_description
+
+  if request.page_type == 'index'
+    assign seo_title = 'Онлайн зоомагазин | Храна за кучета и котки с доставка в София'
+    assign seo_description = 'Купете храна за кучета и котки онлайн от ZooMaster. Марки Meglium, Primordial, MamyNat и ZooMaster. Безплатна доставка в София над 50€ със собствен транспорт.'
+
+  elsif request.page_type == 'collection' and collection != blank
+    assign collection_has_custom_seo_title = false
+    if page_title != collection.title
+      assign collection_has_custom_seo_title = true
+    endif
+
+    assign optimized_title = blank
+    assign optimized_description = blank
+
+    case collection.handle
+      when 'храни-за-кучета-meglium-и-primordial'
+        assign optimized_title = 'Храна за кучета | Суха и мокра храна онлайн'
+        assign optimized_description = 'Разгледайте храна за кучета от Meglium, Primordial и ZooMaster. Суха и консервирана храна с доставка в София и цяла България.'
+      when 'суха-храна-за-кучета'
+        assign optimized_title = 'Суха храна за кучета | Премиум гранули онлайн'
+        assign optimized_description = 'Купете суха храна за кучета онлайн – за малки и големи породи, кученца и възрастни. Качествени марки и бърза доставка.'
+      when 'консервирана-храна-за-кучета'
+        assign optimized_title = 'Консервирана храна за кучета | Мокра храна онлайн'
+        assign optimized_description = 'Мокра и консервирана храна за кучета с различни вкусове. Поръчайте онлайн от ZooMaster с доставка до вашия адрес.'
+      when 'frontpage'
+        assign optimized_title = 'Храна за кученца | Суха храна за малки кучета'
+        assign optimized_description = 'Специализирана храна за кученца и малки кучета. Балансирани формули за растеж от доказани марки.'
+      when 'храна-за-котки-primordial-и-meglium'
+        assign optimized_title = 'Храна за котки | Суха и мокра храна онлайн'
+        assign optimized_description = 'Храна за котки от Primordial, Meglium и ZooMaster. Суха храна, паучове и консерви с доставка в София.'
+      when 'суха-храна-за-котки'
+        assign optimized_title = 'Суха храна за котки | Премиум храна онлайн'
+        assign optimized_description = 'Суха храна за котки за всички възрасти – възрастни, кастрирани и котенца. Поръчайте лесно онлайн от ZooMaster.'
+      when 'консервирана-храна-за-котки'
+        assign optimized_title = 'Консервирана храна за котки | Паучове и консерви'
+        assign optimized_description = 'Мокра храна за котки – консерви и паучове с вкусни рецепти. Бърза доставка от онлайн зоомагазин ZooMaster.'
+      when 'храна-за-малки-котенца'
+        assign optimized_title = 'Храна за котенца | Суха храна за малки котки'
+        assign optimized_description = 'Храна за котенца за здравословен растеж. Изберете подходяща суха храна онлайн от ZooMaster.'
+      when 'лакомства-и-витамини-за-кучета'
+        assign optimized_title = 'Лакомства и витамини за кучета'
+        assign optimized_description = 'Лакомства, снаксове и витамини за кучета. Добавки за здраве, тренировки и ежедневна грижа.'
+      when 'лакомства-и-витамини-за-котки'
+        assign optimized_title = 'Лакомства и витамини за котки'
+        assign optimized_description = 'Лакомства и витамини за котки – за имунитет, козина и добро настроение. Поръчайте онлайн.'
+      when 'аксесоари-за-кучета'
+        assign optimized_title = 'Аксесоари за кучета | Нашийници, играчки и още'
+        assign optimized_description = 'Аксесоари за кучета: нашийници, поводи, играчки, легла и съдове. Всичко за вашия любимец на едно място.'
+      when 'аксесоари-за-котки'
+        assign optimized_title = 'Аксесоари за котки | Играчки, легла и още'
+        assign optimized_description = 'Аксесоари за котки – играчки, драскалки, съдове и транспортни чанти. Качество на добра цена.'
+      when 'нашийници-нагръдници-и-поводи'
+        assign optimized_title = 'Нашийници, нагръдници и поводи за кучета'
+        assign optimized_description = 'Нашийници, нагръдници и поводи за кучета – здрави и удобни модели за ежедневни разходки.'
+      when 'съдове-и-пълнители-за-тоалетни-за-котки'
+        assign optimized_title = 'Котешки тоалетни и пълнители | Хигиена за котки'
+        assign optimized_description = 'Тоалетни и пълнители за котки, постелки и аксесоари за чист дом. Поръчайте онлайн от ZooMaster.'
+      when 'meglium'
+        assign optimized_title = 'Meglium храна за кучета и котки | Официални продукти'
+        assign optimized_description = 'Meglium храна онлайн – суха и мокра храна за кучета и котки. Италианско качество с доставка от ZooMaster.'
+      when 'primordial'
+        assign optimized_title = 'Primordial храна без зърнени | Grain free онлайн'
+        assign optimized_description = 'Primordial grain-free храна за кучета и котки. Натурални рецепти без зърнени съставки – поръчайте от ZooMaster.'
+      when 'mamynat'
+        assign optimized_title = 'MamyNat храна за домашни любимци'
+        assign optimized_description = 'MamyNat продукти онлайн в ZooMaster. Качествена храна за вашите домашни любимци с бърза доставка.'
+      when 'zoomaster', 'zoomaster-1'
+        assign optimized_title = 'ZooMaster храна за кучета и котки'
+        assign optimized_description = 'Собствена линия ZooMaster – храна и продукти за кучета и котки на достъпни цени с доставка в София.'
+      when 'без-глутен'
+        assign optimized_title = 'Храна без глутен за кучета и котки'
+        assign optimized_description = 'Храна без глутен и без зърнени съставки за чувствителни кучета и котки. Изберете подходящ продукт онлайн.'
+      when 'храна-за-птици-1'
+        assign optimized_title = 'Храна за птици | Зоомагазин онлайн'
+        assign optimized_description = 'Храна, крекери и добавки за птици. Поръчайте онлайн от ZooMaster с доставка до вашия адрес.'
+      when 'храна-за-гризачи'
+        assign optimized_title = 'Храна за гризачи | Онлайн зоомагазин'
+        assign optimized_description = 'Храна и лакомства за гризачи. Качествени продукти за зайци, хамстери и други малки любимци.'
+      when 'храна-за-риби'
+        assign optimized_title = 'Храна за риби и препарати за аквариум'
+        assign optimized_description = 'Храна за риби и препарати за аквариум. Всичко за здрав аквариум от ZooMaster.'
+    endcase
+
+    if optimized_title != blank and collection_has_custom_seo_title == false
+      assign seo_title = optimized_title
+    endif
+
+    if page_description == blank and optimized_description != blank
+      assign seo_description = optimized_description
+    elsif page_description == blank and collection.description != blank
+      assign seo_description = collection.description | strip_html | truncate: 160
+    endif
+
+  elsif request.page_type == 'product' and product != blank
+    if page_description == blank
+      assign seo_description = product.title | append: ' – купете онлайн от ZooMaster. Качествени продукти за домашни любимци с доставка в София и цяла България.' | truncate: 160
+    endif
+  endif
+
+  if seo_description == blank and shop.description != blank
+    assign seo_description = shop.description
+  endif
+-%}
+<title>
+  {{ seo_title }}
+  {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+  {%- if current_page != 1 %} &ndash; Страница {{ current_page }}{% endif -%}
+  {%- unless seo_title contains shop.name or seo_title contains 'ZooMaster' %} &ndash; {{ shop.name }}{% endunless -%}
+</title>
+{%- if seo_description != blank -%}
+<meta name="description" content="{{ seo_description | escape | truncate: 160 }}">
+{%- endif -%}

@@ -443,6 +443,10 @@ class HeaderDrawer extends MenuDrawer {
     super();
   }
 
+  isVerticalMenuDesktop() {
+    return Boolean(this.querySelector(':scope > .vertical-menu')) && window.matchMedia('(min-width: 1025px)').matches;
+  }
+
   openMenuDrawer(summaryElement) {
     this.header = this.header || document.querySelector('.section-header');
     this.borderOffset = 0;
@@ -454,6 +458,10 @@ class HeaderDrawer extends MenuDrawer {
     });
 
     summaryElement.setAttribute('aria-expanded', true);
+
+    // Desktop vertical menu opens as a dropdown, not a mobile drawer.
+    if (this.isVerticalMenuDesktop()) return;
+
     trapFocus(this.mainDetailsToggle, summaryElement);
 
 	document.body.setAttribute('data-top', window.pageYOffset);
@@ -463,6 +471,19 @@ class HeaderDrawer extends MenuDrawer {
   }
 
   closeMenuDrawer(event, elementToFocus) {
+    if (this.isVerticalMenuDesktop()) {
+      if (event) event.preventDefault();
+      this.mainDetailsToggle.classList.remove('menu-opening');
+      this.mainDetailsToggle.querySelector('summary')?.setAttribute('aria-expanded', false);
+      this.header?.classList.remove('menu-open');
+      setTimeout(() => {
+        if (!this.mainDetailsToggle.classList.contains('menu-opening')) {
+          this.mainDetailsToggle.removeAttribute('open');
+        }
+      }, 300);
+      return;
+    }
+
     super.closeMenuDrawer(event, elementToFocus);
     this.header.classList.remove('menu-open');
   }

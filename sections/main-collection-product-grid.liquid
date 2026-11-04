@@ -83,7 +83,7 @@ endif
     -%}
     
     {%- if enable_filtering and horizontal_filters == false -%}
-    <div class="col-one_fifth{% if settings.page_width_main == "page-wide" or section.settings.width == "page-wide" %} col-xxl-2{% endif %} hide-st mt40">
+    <div class="facets-sidebar col-one_fifth{% if settings.page_width_main == "page-wide" or section.settings.width == "page-wide" %} col-xxl-2{% endif %} hide-st mt40">
       {%- render 'facets', 
           results: collection,
           enable_filtering: enable_filtering,

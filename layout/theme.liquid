@@ -19,18 +19,9 @@
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
 
-    <title>
-      {{ page_title }}
-      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
-      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
-    </title>
-
-    {% if page_description %}
-      <meta name="description" content="{{ page_description | escape }}">
-    {% endif %}
-
+    {% render 'seo-meta' %}
     {% render 'meta-tags' %}
+    {% render 'seo-jsonld' %}
 
     <script src="{{ 'constants.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'pubsub.js' | asset_url }}" defer="defer"></script>
@@ -420,6 +411,9 @@
           {% if header contains ' data-menu-opened=' and template == 'index' %}data-menu-in-content="{{ header | split:'data-menu-opened="' | last | split: '"' | first }}"{% endif %}
           {% if header contains 'data-header-wide' and template == 'index' %}data-header-wide="true"{% endif %}
           >
+      {%- if request.page_type == 'index' -%}
+        <h1 class="visually-hidden">Онлайн зоомагазин ZooMaster – храна за кучета и котки с доставка в София</h1>
+      {%- endif -%}
       {%- render "breadcrumb", header:header -%}
       {{ content_for_layout }}
     </main>
