@@ -411,11 +411,12 @@
           {% if header contains ' data-menu-opened=' and template == 'index' %}data-menu-in-content="{{ header | split:'data-menu-opened="' | last | split: '"' | first }}"{% endif %}
           {% if header contains 'data-header-wide' and template == 'index' %}data-header-wide="true"{% endif %}
           >
+      {%- render "breadcrumb", header:header -%}
+      {{ content_for_layout }}
+      {%- comment -%} Keep after sections so data-menu-in-content offset targets the first shopify section {%- endcomment -%}
       {%- if request.page_type == 'index' -%}
         <h1 class="visually-hidden">Онлайн зоомагазин ZooMaster – храна за кучета и котки с доставка в София</h1>
       {%- endif -%}
-      {%- render "breadcrumb", header:header -%}
-      {{ content_for_layout }}
     </main>
 
     {% sections 'footer-group' %}

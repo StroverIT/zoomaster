@@ -19,16 +19,22 @@ class headerMenuHandler extends HTMLElement {
     }
   }
   resizeMenu(){
-    const main_content = document.getElementById('MainContent'),
-          items_top_position = window.scrollY + this.menuholder.getBoundingClientRect().top;
+    const main_content = document.getElementById('MainContent');
     
     if(!main_content.children.length) return;
     
+    // Always show every menu item — do not truncate behind "show more".
     this.querySelectorAll('.hidden-menu-item').forEach((item) => {item.classList.remove('hidden-menu-item')});
+    this.button && this.button.classList.add('hide');
+    this.classList.remove('menu-opened', 'menu-show-items');
+    this.button && this.button.classList.remove('active');
 
     if(main_content.hasAttribute('data-menu-in-content') || main_content.classList.contains('menu-opened-by-default')){
-      const index = Number(main_content.getAttribute('data-menu-in-content')) - 1,
-      		section_height = window.scrollY + main_content.children[index].getBoundingClientRect().bottom,
+      const index = Math.max(0, Number(main_content.getAttribute('data-menu-in-content')) - 1);
+      const sections = main_content.querySelectorAll(':scope > .shopify-section');
+      const targetSection = sections[index] || main_content.children[index];
+      if (!targetSection) return;
+      const section_height = window.scrollY + targetSection.getBoundingClientRect().bottom,
       		menu_top_position = (this.closest('.menu-opened-by-default') ? 0 : window.scrollY) + this.getBoundingClientRect().top;
       var height = section_height - menu_top_position;
 
@@ -36,36 +42,18 @@ class headerMenuHandler extends HTMLElement {
         height = Math.min(height, this.menuholder.offsetHeight + 20);
 		height = height < -1 ? this.menuholder.offsetHeight + 20 : height;
       }
-      this.style.height = '100%';
-      this.style.minHeight = height+'px';
-      this.renderItems(items_top_position,height);
+      this.style.height = 'auto';
+      this.style.minHeight = Math.max(height, this.menuholder.offsetHeight) + 'px';
     }
     else{
-      this.renderItems(items_top_position,620);
+      this.style.height = '';
+      this.style.minHeight = '';
     }
     this.hasAttribute('hide-before-load') && this.removeAttribute('hide-before-load');
   }
-  renderItems(items_top_position,height){
-    var hide_item = true;
-    var offsetmain = this.menuholder.children[0].offsetTop;
-    for(var i=this.menuholder.children.length-1; i>=0; i--){
-      var item = this.menuholder.children[i],
-          y = item.offsetTop + offsetmain + item.offsetHeight;
-      if(this.menuholder.children.length-1 == i && y <= height){
-        this.button.classList.add('hide');
-        return 'break';
-      }
-      else if(y > height){
-        this.button.classList.contains('hide') && this.button.classList.remove('hide');
-        item.classList.add('hidden-menu-item');
-      }
-      else{
-        if(hide_item){
-          hide_item = false;
-          y > height-this.button.offsetHeight-15 && item.classList.add('hidden-menu-item');
-        }
-      }
-    }
+  renderItems(){
+    this.querySelectorAll('.hidden-menu-item').forEach((item) => {item.classList.remove('hidden-menu-item')});
+    this.button && this.button.classList.add('hide');
   }
   resizeMenuEvent(){
     //if(Shopify.designMode){

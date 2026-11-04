@@ -1,0 +1,257 @@
+{{ 'section-slideshow.css' | asset_url | stylesheet_tag }}
+{{ 'section-banners.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign page_width = section.settings.width
+  if page_width == 'default'
+    assign page_width = settings.page_width_main
+  endif
+  assign side_image = section.settings.side_image
+  assign slide_blocks = section.blocks | where: 'type', 'slide'
+-%}
+
+<style>
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__grid {
+    align-items: stretch;
+  }
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__slider,
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__side {
+    min-width: 0;
+  }
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__side .image-hover-scaling__image,
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__slider .image-hover-scaling__image {
+    height: 100%;
+  }
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__side a,
+  #hero-slider-banner-{{ section.id }} .hero-slider-banner__side .image-hover-scaling__box {
+    display: block;
+    height: 100%;
+  }
+  @media (max-width: 1024px) {
+    #hero-slider-banner-{{ section.id }} .hero-slider-banner__side {
+      margin-top: 12px;
+    }
+  }
+</style>
+
+<div id="hero-slider-banner-{{ section.id }}"
+     class="top-spacing-{{ section.settings.top_spacing }} image-banner-section"
+     data-section-name="hero-slider-banner">
+  <div class="{{ page_width }} image-banner__internal mb--last-child-0">
+    <div class="grid el_mt_auto image-banner__grid hero-slider-banner__grid">
+      <div class="col-sp-12 col-st-6 col-6 hero-slider-banner__slider">
+        {%- if slide_blocks.size > 0 -%}
+          <big-slider class="image-size-auto"
+            {% if section.settings.autoplay_enabled and request.design_mode == false and slide_blocks.size > 1 %}
+              data-autoplay="{{ section.settings.autoplay_time | times: 1000 }}"
+            {% endif %}
+            data-video-autoplay="false"
+          >
+            <div class="big-slider__items for-buttons--js{% if section.settings.show_arrows %} big-slider__items__text-padding-big{% endif %}">
+              {%- for block in slide_blocks -%}
+                {%- liquid
+                  assign check_link = false
+                  if block.settings.url != blank
+                    assign check_link = true
+                  endif
+                  if check_link
+                    assign html_tag_open = '<a' | append: ' href="' | append: block.settings.url | append: '"'
+                    assign html_tag_close = '</a'
+                  else
+                    assign html_tag_open = '<div'
+                    assign html_tag_close = '</div'
+                  endif
+                  assign main_image_source = block.settings.image
+                -%}
+                {{ html_tag_open }}
+                  id="block-{{ block.id }}"
+                  class="clear-underline for-buttons__item--js slideshow hover-area{% if forloop.first %} active slideshow-active-in-start{% endif %}"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- if main_image_source == blank -%}
+                    <div class="image-hover-scaling__image border__radius placeholder__svg--bg">
+                      {%- render 'icons-placeholder-other', icon_name: 'lifestyle' -%}
+                    </div>
+                  {%- else -%}
+                    <div class="image-hover-scaling__image border__radius" style="--aspect-ratio: {{ main_image_source.aspect_ratio }};">
+                      {%- assign image = main_image_source -%}
+                      {%- capture sizes -%}
+                        (min-width: 1025px) calc((100vw - 220px) / 2), calc(100vw - 40px)
+                      {%- endcapture -%}
+                      {%- capture image_class -%}{% if settings.animate_image_show %}image-show--fadein{% endif %}{%- endcapture -%}
+                      {%- capture animate_image_show -%}{% if settings.animate_image_show %}this.classList.add('image-loaded');{% endif %}{%- endcapture -%}
+                      {{
+                        image
+                        | image_url: width: image.width
+                        | image_tag:
+                          loading: 'lazy',
+                          width: image.width,
+                          height: image.height,
+                          sizes: sizes,
+                          widths: '360, 533, 720, 940, 1200',
+                          class: image_class,
+                          onload: animate_image_show
+                      }}
+                    </div>
+                  {%- endif -%}
+                {{ html_tag_close }}>
+              {%- endfor -%}
+            </div>
+
+            <div class="ctrl{% unless section.settings.show_arrows %} desktop__navigation__hide{% endunless %}{% if slide_blocks.size <= 1 %} hide{% endif %}">
+              <div class="ctrl__button ctrl__button--left btn-color">{%- render 'icon-arrow-left' -%}</div>
+              <div class="ctrl__button ctrl__button--right btn-color">{%- render 'icon-arrow-right' -%}</div>
+            </div>
+
+            <ul class="big-slider__dots for-buttons--js unstyle-ul big-slider__dots-bottom-center{% unless section.settings.show_dots %} desktop__navigation__hide{% endunless %}{% if slide_blocks.size <= 1 %} hide{% endif %}">
+              {%- for block in slide_blocks -%}
+                <li class="big-slider__dots__item for-buttons__item--js{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}"></li>
+              {%- endfor -%}
+            </ul>
+          </big-slider>
+        {%- endif -%}
+      </div>
+
+      <div class="col-sp-12 col-st-6 col-6 hero-slider-banner__side">
+        {%- if side_image != blank -%}
+          {%- if section.settings.side_url != blank -%}
+            <a href="{{ section.settings.side_url }}" class="clear-underline image-banner hover-area">
+          {%- else -%}
+            <div class="image-banner hover-area">
+          {%- endif -%}
+            <div class="image-hover-scaling__box position-relative">
+              <div class="image-hover-scaling__image border__radius" style="--aspect-ratio: {{ side_image.aspect_ratio }};">
+                {%- assign image = side_image -%}
+                {%- capture sizes -%}
+                  (min-width: 1025px) calc((100vw - 220px) / 2), calc(100vw - 40px)
+                {%- endcapture -%}
+                {%- capture image_class -%}{% if settings.animate_image_show %}image-show--fadein{% endif %}{%- endcapture -%}
+                {%- capture animate_image_show -%}{% if settings.animate_image_show %}this.classList.add('image-loaded');{% endif %}{%- endcapture -%}
+                {{
+                  image
+                  | image_url: width: image.width
+                  | image_tag:
+                    loading: 'lazy',
+                    width: image.width,
+                    height: image.height,
+                    sizes: sizes,
+                    widths: '360, 533, 720, 940, 1200',
+                    class: image_class,
+                    onload: animate_image_show
+                }}
+              </div>
+            </div>
+          {%- if section.settings.side_url != blank -%}
+            </a>
+          {%- else -%}
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero slider + banner",
+  "tag": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "top_spacing",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "normal", "label": "Normal" }
+      ],
+      "default": "none",
+      "label": "Top spacing"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "options": [
+        { "value": "default", "label": "Default" },
+        { "value": "page-width", "label": "Boxed" },
+        { "value": "page-wide", "label": "Wide" }
+      ],
+      "default": "page-wide",
+      "label": "Width"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay_enabled",
+      "default": true,
+      "label": "Autoplay slider"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_time",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Autoplay delay",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "default": true,
+      "label": "Show arrows"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "default": true,
+      "label": "Show dots"
+    },
+    {
+      "type": "header",
+      "content": "Side banner"
+    },
+    {
+      "type": "image_picker",
+      "id": "side_image",
+      "label": "Side banner image"
+    },
+    {
+      "type": "url",
+      "id": "side_url",
+      "label": "Side banner link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero slider + banner",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
+}
+{% endschema %}

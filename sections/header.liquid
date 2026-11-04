@@ -827,7 +827,6 @@
       window.addEventListener('scroll', this.onScrollHandler, false);
 
       this.createObserver();
-      this.bindVerticalMenuStickyOpen();
     }
     
     disconnectedCallback() {
@@ -837,68 +836,17 @@
 
     createObserver() {
       let observer = new IntersectionObserver((entries, observer) => {
-        this.headerBounds = entries[0].boundingClientRect;
+        this.headerBounds = entries[0].intersectionRect;
         observer.disconnect();
       });
 
       observer.observe(this.header);
-      // Fallback if IntersectionObserver does not fire promptly
-      this.headerBounds = this.header.getBoundingClientRect();
-    }
-
-    isDesktop() {
-      return window.matchMedia('(min-width: 1025px)').matches;
-    }
-
-    canOpenVerticalMenuOnSticky() {
-      const menu = this.querySelector('.vertical-menu');
-      if (!menu || !this.isDesktop()) return false;
-      if (menu.hasAttribute('data-menu-opened')) return false;
-      return this.header.classList.contains('shopify-section-header-sticky')
-        && !this.header.classList.contains('shopify-section-header-hidden');
-    }
-
-    openVerticalMenuDropdown(menu) {
-      menu.setAttribute('open', 'true');
-      menu.classList.add('menu-opening');
-      this.header.classList.add('menu-open');
-      menu.querySelector('summary')?.setAttribute('aria-expanded', 'true');
-    }
-
-    closeVerticalMenuDropdown(menu) {
-      menu.classList.remove('menu-opening');
-      this.header.classList.remove('menu-open');
-      menu.querySelector('summary')?.setAttribute('aria-expanded', 'false');
-      setTimeout(() => {
-        if (!menu.classList.contains('menu-opening') && !menu.hasAttribute('data-menu-opened')) {
-          menu.removeAttribute('open');
-        }
-      }, 300);
-    }
-
-    bindVerticalMenuStickyOpen() {
-      const menu = this.querySelector('.vertical-menu');
-      if (!menu) return;
-
-      menu.addEventListener('mouseenter', () => {
-        if (!this.canOpenVerticalMenuOnSticky()) return;
-        this.mouse_in_menu = true;
-        this.openVerticalMenuDropdown(menu);
-      });
-
-      menu.addEventListener('mouseleave', () => {
-        if (!this.isDesktop() || menu.hasAttribute('data-menu-opened')) return;
-        if (!this.header.classList.contains('shopify-section-header-sticky')) return;
-        this.mouse_in_menu = false;
-        this.closeVerticalMenuDropdown(menu);
-      });
     }
 
     onScroll() {      
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-      // Keep open sticky dropdown stable while the cursor is over the menu.
-      if (this.mouse_in_menu && (this.isDesktop() || !this.menu_opened)) return;
+      if (this.mouse_in_menu && !this.menu_opened) return;
 
       if (scrollTop > this.currentScrollTop && scrollTop > this.headerBounds.bottom + this.checkVerticalMenuPostion()) { //+ сюда
         if (this.preventHide) return;
@@ -930,14 +878,7 @@
       }
 
       this.menu_opened = true;
-
-      // Keep sticky header visible on desktop so the vertical menu can open while scrolled.
-      if (this.isDesktop()) {
-        this.header.classList.add('shopify-section-header-sticky', 'animate');
-        this.header.classList.remove('shopify-section-header-hidden', 'shopify-section-first-hide');
-      } else {
-        this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky', 'shopify-section-first-hide');
-      }
+      this.header.classList.add('shopify-section-header-hidden', 'shopify-section-header-sticky', 'shopify-section-first-hide');
       
       const menu = this.querySelector('.vertical-menu');
       if(menu){
